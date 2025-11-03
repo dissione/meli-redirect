@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Meli Redirect</title>
+    <script>
+        // Extraer código de la URL y mostrar para copiar
+        const urlParams = new URLSearchParams(window.location.search);
+        const authCode = urlParams.get('code');
+        
+        if (authCode) {
+            document.getElementById('codeDisplay').textContent = authCode;
+            // Copiar automáticamente al portapapeles
+            navigator.clipboard.writeText(authCode).then(() => {
+                document.getElementById('message').textContent = '✅ Código copiado al portapapeles!';
+            });
+        }
+    </script>
+</head>
+<body>
+    <h2>Autenticación MercadoLibre</h2>
+    <div id="message">⏳ Procesando código...</div>
+    <div>
+        <strong>Código:</strong>
+        <span id="codeDisplay" style="background:#f0f0f0; padding:5px; display:block; margin:10px 0;"></span>
+    </div>
+    <p>Ahora puedes cerrar esta ventana y pegar el código en tu script.</p>
+</body>
+</html>

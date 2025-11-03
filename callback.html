@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Callback - MercadoLibre Auth</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+        .code-box {
+            background: #fff;
+            border: 2px solid #3483fa;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 16px;
+            word-break: break-all;
+        }
+        .btn {
+            background: #3483fa;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background: #2968c8;
+        }
+        .success { color: #00a650; }
+        .error { color: #f04449; }
+        .info { 
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 Autenticación MercadoLibre</h1>
+        <div id="content">
+            <p>Procesando autorización...</p>
+        </div>
+    </div>
+
+    <script>
+        function getCodeFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('code');
+        }
+
+        function displaySuccess(code) {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <h2 class="success">✅ ¡Autenticación Exitosa!</h2>
+                
+                <div class="info">
+                    <strong>Instrucciones:</strong>
+                    <ol>
+                        <li>Copia el código de abajo</li>
+                        <li>Regresa a tu terminal/script Python</li>
+                        <li>Pega el código cuando te lo solicite</li>
+                        <li>Esta ventana se puede cerrar después</li>
+                    </ol>
+                </div>
+
+                <p><strong>Código de autorización:</strong></p>
+                <div class="code-box" id="codeText">${code}</div>
+                
+                <button class="btn" onclick="copyCode()">📋 Copiar Código</button>
+                <span id="copyMessage" style="margin-left: 10px;"></span>
+
+                <div style="margin-top: 20px; padding: 10px; background: #fff; border-radius: 4px;">
+                    <strong>⚠️ Importante:</strong>
+                    <p>Este código expira en 10 minutos. Úsalo pronto en tu script.</p>
+                </div>
+            `;
+        }
+
+        function displayError() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <h2 class="error">❌ Error en la autenticación</h2>
+                <p>No se recibió el código de autorización.</p>
+                <p>Posibles causas:</p>
+                <ul>
+                    <li>La autorización fue cancelada</li>
+                    <li>Hubo un error en el proceso</li>
+                    <li>La URL no contiene el parámetro 'code'</li>
+                </ul>
+                <p>Intenta nuevamente desde tu script Python.</p>
+            `;
+        }
+
+        function copyCode() {
+            const codeText = document.getElementById('codeText').textContent;
+            navigator.clipboard.writeText(codeText).then(() => {
+                const message = document.getElementById('copyMessage');
+                message.textContent = '✓ ¡Código copiado!';
+                message.style.color = '#00a650';
+                
+                // Resetear mensaje después de 3 segundos
+                setTimeout(() => {
+                    message.textContent = '';
+                }, 3000);
+            }).catch(err => {
+                document.getElementById('copyMessage').textContent = '❌ Error al copiar';
+            });
+        }
+
+        // Auto-copiar al cargar la página
+        function autoCopyCode(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                console.log('Código copiado automáticamente');
+            }).catch(err => {
+                console.log('No se pudo copiar automáticamente');
+            });
+        }
+
+        // Procesar cuando carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            const authCode = getCodeFromURL();
+            
+            if (authCode) {
+                displaySuccess(authCode);
+                autoCopyCode(authCode); // Intentar copiar automáticamente
+            } else {
+                displayError();
+            }
+        });
+    </script>
+</body>
+</html>
